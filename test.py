@@ -7,7 +7,7 @@ class Graph:
 #-----------repr-------------#
     def __repr__(self):
         gragh_str = ""
-        for node, neighbors in self.adj_list:
+        for node, neighbors in self.adj_list.items():
             gragh_str += f"{node} -> {neighbors}\n"
         return gragh_str
 
