@@ -7,4 +7,4 @@ class StartHubParser(BaseParser):
         self.start_hub_data = {}
 
     def parse(config: str) ->  Dict[str, Tuple]:
-                
+        is_first = 1
