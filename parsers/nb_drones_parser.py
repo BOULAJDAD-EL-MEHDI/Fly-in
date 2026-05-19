@@ -1,26 +1,30 @@
 from parsers import BaseParser
-from parsers import Dict, Tuple, List
-from ..exeptions import NbDronesError
+from parsers import Dict, Tuple
+from parsers import BaseModel, Field
+from parsers import NbDronesError
+
+
+class NbDronesConfig(BaseModel):
+    nb_drones: int = Field(gt=0)
+
 
 class NbDronesParser(BaseParser):
-    def __init__(self, config: str) -> None:
-        self.config = config
+    nb_drones_key = "nb_drones"
 
-    def parse(config: List) ->  Dict[str, Tuple]:
-        config_len = len(config)
-        config[0] = config[0].lower()
-        if not config[0].startswith("nb_drones"):
-            raise NbDronesError('the config file is not starting with "nb_drones" parameter !')
-        for i in range(1, config_len):
-            config[i] = config[i].lower()
-            if config[i].startswith("nb_drones"):
-                raise NbDronesError('to many "nb_drones" parameters!')
-        key, value = config[0].split(":")
-        nb_drones_config: Dict[str, Tuple[str, str]] = {
-            key.strip(): (key.strip(), value.strip())
-        }
-
-        return nb_drones_config
+    def parse(self, line: str) -> NbDronesConfig:
+        nb_drones_key, value = self._split_line(line)
+        self._validate_nb_drones_key(nb_drones_key)
+        value = self._parse_value(value)
+        return NbDronesConfig(nb_drones = value)
     
+    def _split_line(self, line: str) -> Tuple[str, str]:
+        self.nb_drones_key, Value = line.split(":")
+        if nb_drones_key.lower() != self.nb_drones_key:
+            raise NbDronesError("Invalid_nb_drones_key")
 
-        
+
+    def parse_value(self, value: str) -> int:
+        try:
+             return int(value)
+        except NbDronesError:
+            raise NbDronesError("nb_derones must be integer") 
