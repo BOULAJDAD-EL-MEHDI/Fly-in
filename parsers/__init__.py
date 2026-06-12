@@ -5,6 +5,7 @@ from ..exeptions import NbDronesError
 from ..exeptions import StartHubError
 from enum import Enum
 from Pydantic import BaseModel, Field
+from colors import HubColor
 
 __all__ = ["ABC",
            "abstractmethod",
@@ -17,4 +18,5 @@ __all__ = ["ABC",
            "Field",
            "NbDronesError",
            "StartHubError",
-           "Enum"]
+           "Enum",
+           "HubColor"]
