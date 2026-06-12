@@ -4,7 +4,8 @@ from parsers import BaseModel, Field
 from parsers import StartHubError
 
 
-class Hub
+class Hub:
+    pass
 
 class StartHubConfig(BaseModel):
     start_hub: Tuple[int, int]
@@ -13,11 +14,12 @@ class StartHubConfig(BaseModel):
 
 
 class StartHubParser(BaseParser):
-    start_key = "start__hub"
+    start_key = "start_hudb"
 
     def parse(self, line: str) -> StartHubConfig:
-        splitd = self._split_line(line)
-        self._key_validation(line)
+        start_hub_list = ()
+        start_hub_list = self._split_line(line)
+        self._key_validation(start_hub_list[0])
         coordinates = self._coordinates_validation(line)
         color = self._color_validation(line)
         
@@ -28,9 +30,10 @@ class StartHubParser(BaseParser):
         start_hub_splited = line.split(" ")
         return start_hub_splited
 
-    def _key_validation(self, line: Tuple) -> None:
-        start_key = line[0].lower()
-        if start_key != self.start_key:
+    def _key_validation(self, key: str) -> None:
+        start_key = key.lower()
+        key = key.strip()
+        if start_key.lower() != self.start_key:
             raise StartHubError("Invalid key !")
         
     def _coordinates_validation(self, line: Tuple) -> Tuple[int, int]:
