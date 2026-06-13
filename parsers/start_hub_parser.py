@@ -11,7 +11,7 @@ class Hub:
 class StartHubConfig(BaseModel):
     start_hub: Tuple[int, int]
     color: str
-    max_drones: int(default=1, gt=0)
+    max_drones: int = Field(default=1, gt=0)
 
 
 class StartHubParser(BaseParser, StartHubConfig):
@@ -25,6 +25,7 @@ class StartHubParser(BaseParser, StartHubConfig):
         color = self._color_validation(line)
         max_drones = self._max_drones_validation(line)
         start_hub_list = coordinates, color, max_drones
+        return start_hub_list
 
         
 

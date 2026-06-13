@@ -8,7 +8,7 @@ class NbDronesConfig(BaseModel):
     nb_drones: int = Field(gt=0)
 
 
-class NbDronesParser(BaseParser):
+class NbDronesParser(BaseParser, NbDronesConfig):
     nb_drones_key = "nb_drones"
 
     def parse(self, line: str) -> Tuple[str, int]:

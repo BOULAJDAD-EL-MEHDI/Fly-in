@@ -14,6 +14,6 @@ class EndHubError(Exception):
     """raising end hub errors """
     pass
 
-class ConnectionError(Exception):
+class ConnectionsError(Exception):
     """raising connection errors """
     pass
