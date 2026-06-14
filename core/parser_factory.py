@@ -7,7 +7,7 @@ from core import List
 from core import ConfigError
 
 
-class FactoryParser:
+class ParserFactory:
     with open("config.txt") as config_text:
         config_lines = config_text.readlines()
     
@@ -32,10 +32,7 @@ class FactoryParser:
             raise ConfigError("\n".join(errors))
         
     def _nb_drones_key_verify(self, lines: List) -> None:
-        
-
-
-
+        pass
 
     def _kyes_geter(self, lines: str) -> None:
         keys = []
