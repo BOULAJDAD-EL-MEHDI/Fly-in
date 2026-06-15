@@ -4,6 +4,8 @@ from parsers import StartHubParser
 from parsers import EndHubParser
 from parsers import HubParser
 from parsers import ConnectionParser
+from exeptions import ParsingKeyError
+from parsers import BaseParser
 
 
 class ConfigError(Exception):
@@ -15,4 +17,6 @@ __all__ = ["FactoryParser",
            "StartHubParser",
            "EndHubParser",
             "HubParser",
-            "ConnectionParser"]
+            "ConnectionParser",
+            "ParsingKeyError",
+            "BaseParser"]

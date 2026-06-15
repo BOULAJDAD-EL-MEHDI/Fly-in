@@ -17,3 +17,7 @@ class EndHubError(Exception):
 class ConnectionsError(Exception):
     """raising connection errors """
     pass
+
+class ParsingKeyError(Exception):
+    """raisign any key Error !"""
+    pass
