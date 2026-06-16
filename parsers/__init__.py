@@ -7,7 +7,9 @@ from ..exeptions import EndHubError
 from ..exeptions import HubError
 from ..exeptions import ConnectionsError
 from enum import Enum
-from Pydantic import BaseModel, Field
+from Pydantic import BaseModel
+from Pydantic import Field
+from Pydantic import ValidationError
 from colors import HubColor
 
 __all__ = ["ABC",
@@ -19,6 +21,7 @@ __all__ = ["ABC",
            "Optional",
            "BaseModel",
            "Field",
+           "ValidationError",
            "NbDronesError",
            "StartHubError",
            "EndHubError",

@@ -5,9 +5,6 @@ from parsers import HubError
 from parsers import HubColor
 
 
-class Hub:
-    pass
-
 class HubConfig(BaseModel):
     loop: Tuple[int, int]
     color: str
