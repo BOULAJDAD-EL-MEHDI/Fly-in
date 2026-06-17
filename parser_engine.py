@@ -1,7 +1,5 @@
 from core import ParserFactory
 
-
-
 class ParserEngine:
 
     def __init__(self, config_path: str) -> None:
@@ -15,7 +13,7 @@ class ParserEngine:
             for line in file:
                 line = line.strip()
 
-                if not line or line.startswith("#"):
+                if not line or line.startswith("#") or "#" in line:
                     continue
 
                 key = line.split(":")[0].lower()
