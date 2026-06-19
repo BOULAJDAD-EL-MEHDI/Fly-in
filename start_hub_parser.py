@@ -1,73 +1,63 @@
-from parsers import BaseParser
-from parsers import List, Tuple
-from parsers import BaseModel, Field
-from parsers import StartHubError
-from parsers import HubColor
+import re
+from dataclasses import dataclass
+from typing import Tuple
+from base_parser import BaseParser
+from colors import HubColor
+from parser_errors import StartHubError
 
 
-class StartHubConfig(BaseModel):
+@dataclass
+class StartHubConfig:
     start_hub: Tuple[int, int]
     color: HubColor
-    max_drones: int = Field(default=1, gt=0)
+    max_drones: int = 1
 
 
 class StartHubParser(BaseParser):
 
     def parse(self, line: str) -> StartHubConfig:
-        start_hub_list = []
-        start_hub_list = self._split_line(line)
-        self._key_validation(start_hub_list[0])
-        coordinates = self._coordinates_validation(start_hub_list)
-        if len(start_hub_list) == 5:
-            color = self._color_validation(start_hub_list[4])
-            return StartHubConfig(start_hub = coordinates, color = color, max_drones = 1)
-        elif len(start_hub_list) == 6:
-            color = self._color_validation(start_hub_list[4])
-            max_drones = self._max_drones_validation(start_hub_list[5])
-            return StartHubConfig(start_hub = coordinates, color = color, max_drones = max_drones)
-        else:
-            raise StartHubError("Invalide start_hub format !")
+        tokens = self._split_line(line)
+        self._key_validation(tokens[0])
+        coordinates = self._coordinates_validation(tokens)
+        attributes = self._parse_attributes(line)
+        color = self._color_validation(attributes)
+        max_drones = self._max_drones_validation(attributes)
+        return StartHubConfig(start_hub=coordinates, color=color, max_drones=max_drones)
 
-    def _split_line(self, line: str) -> List[str]:
-        start_hub_splited = []
-        start_hub_splited = line.split(" ")
-        return start_hub_splited
+    def _split_line(self, line: str) -> list[str]:
+        line = re.sub(r"\s*\[[^\]]+\]\s*$", "", line).strip()
+        return line.split()
 
     def _key_validation(self, key: str) -> None:
         start_key = key.lower().strip(":")
         if start_key != "start_hub":
             raise StartHubError("Invalid start_hub key !")
         
-    def _coordinates_validation(self, line: List) -> Tuple[int, int]:
-        start_hub = ()
-        if line[1].lower().strip() != "start":
-            raise StartHubError("the start name of coordinates dos not exist !")
+    def _coordinates_validation(self, tokens: list[str]) -> Tuple[int, int]:
+        if len(tokens) < 4 or tokens[1].lower().strip() != "start":
+            raise StartHubError("The start name of coordinates does not exist !")
         try:
-            x = int(line[2])
-            y = int(line[3])
-            start_hub = x, y
+            x = int(tokens[2])
+            y = int(tokens[3])
+            return x, y
         except ValueError:
-            raise StartHubError("Invalide coordinates type !")
-        return start_hub
+            raise StartHubError("Invalid coordinates type !")
     
-    def _color_validation(self, line: str) -> str:
-        color_key, color_value = line.split("=")
-        color_key = color_key.strip("[ ]")
-        if color_key.lower() != "color":
-            raise StartHubError("Invalid color key !")
+    def _color_validation(self, attributes: dict) -> HubColor:
+        color_value = attributes.get("color")
+        if not color_value:
+            raise StartHubError("Missing color value !")
         try:
-            color_value = HubColor(color_value)
-            return color_value
-        except Exception:
+            return HubColor(color_value)
+        except ValueError:
             raise StartHubError("Invalid color value !")
         
-    def _max_drones_validation(self, line: str) -> int:
-        max_drones_key, max_drones_value = line.split("=")
-        if max_drones_key.lower() != "max_drones":
-            raise StartHubError("Invalid max_drones key !")
-        max_drones_value = max_drones_value.strip("]")
+    def _max_drones_validation(self, attributes: dict) -> int:
+        max_drones_str = attributes.get("max_drones", "1")
         try:
-            max_drones = int(max_drones_value)
-        except Exception:
-            raise StartHubError("Invalid max_drones Key !")
+            max_drones = int(max_drones_str)
+        except ValueError:
+            raise StartHubError("Invalid max_drones value !")
+        if max_drones <= 0:
+            raise StartHubError("max_drones must be greater than 0 !")
         return max_drones

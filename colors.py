@@ -1,4 +1,4 @@
-from parsers import Enum
+from enum import Enum
 
 
 class HubColor(Enum):

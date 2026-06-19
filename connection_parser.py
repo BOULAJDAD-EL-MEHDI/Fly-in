@@ -1,28 +1,30 @@
-from parsers import BaseParser
-from parsers import Tuple
-from parsers import List
-from parsers import ConnectionsError
-from parsers import BaseModel
+import re
+from dataclasses import dataclass
+from typing import Tuple
+from base_parser import BaseParser
+from parser_errors import ConnectionsError
 
 
-class ConnectionConfig(BaseModel):
-    connection: Tuple
-    link_capacity: int
+@dataclass
+class ConnectionConfig:
+    connection: Tuple[str, str]
+    link_capacity: int = 1
+
 
 class ConnectionParser(BaseParser):
 
     def parse(self, line: str) -> ConnectionConfig:
-        connection_list = self._split_line(line)
-        self._key_validation(connection_list[0])
-        connection = self._connections_validation(connection_list[1])
-        if len(connection_list) == 3:
-            max_link_capacity = self._link_capacity(connection_list[2])
-            return ConnectionConfig(connection = connection, max_link_capacity = max_link_capacity)
-        return ConnectionConfig(connection = connection, max_link_capacity = 1)
-    
-    def _split_line(self, line: str) -> List:
-        return line.split(" ")
-    
+        fields = self._split_line(line)
+        self._key_validation(fields[0])
+        connection = self._connections_validation(fields[1])
+        attributes = self._parse_attributes(line)
+        max_link_capacity = self._link_capacity(attributes)
+        return ConnectionConfig(connection=connection, link_capacity=max_link_capacity)
+
+    def _split_line(self, line: str) -> list[str]:
+        line = re.sub(r"\s*\[[^\]]+\]\s*$", "", line).strip()
+        return line.split()
+
     def _key_validation(self, key: str) -> None:
         connection_key = key.lower().strip(": ")
         if connection_key != "connection":
@@ -31,16 +33,13 @@ class ConnectionParser(BaseParser):
     def _connections_validation(self, line: str) -> Tuple[str, str]:
         connections = line.split("-")
         if len(connections) != 2:
-            raise ConnectionError("Invalide connections: must contain two hubs !")
-        return connections[0],connections[1]
+            raise ConnectionsError("Invalid connections: must contain two hubs !")
+        return connections[0], connections[1]
 
-    def _link_capacity(self, line: str) -> int:
-        link_capacity = line.strip("[]")
-        link_capacity_key, max_link_capacity = link_capacity.split("=")
-        if link_capacity_key.lower() != "max_link_capacity":
-            raise ConnectionsError("Invalid link capacity key !")
+    def _link_capacity(self, attributes: dict) -> int:
+        raw_value = attributes.get("max_link_capacity", "1")
         try:
-            return int(max_link_capacity)
+            return int(raw_value)
         except ValueError:
-            raise ConnectionError("Invalid link capacity value !")
+            raise ConnectionsError("Invalid link capacity value !")
         

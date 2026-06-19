@@ -1,10 +1,10 @@
-from core import NbDronesParser
-from core import StartHubParser
-from core import EndHubParser
-from core import HubParser
-from core import ConnectionParser
-from core import ParsingKeyError
-from core import BaseParser
+from nb_drones_parser import NbDronesParser
+from start_hub_parser import StartHubParser
+from end_hub_parser import EndHubParser
+from hub_parser import HubParser
+from connection_parser import ConnectionParser
+from parser_errors import ParsingKeyError
+from base_parser import BaseParser
 
 
 class ParserFactory:

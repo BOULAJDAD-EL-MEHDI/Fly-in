@@ -1,32 +1,29 @@
-from parsers import BaseParser
-from parsers import List
-from parsers import BaseModel, Field
-from parsers import NbDronesError
-from parsers import ValidationError-
+from dataclasses import dataclass
+from base_parser import BaseParser
+from parser_errors import NbDronesError
 
 
-class NbDronesConfig(BaseModel):
-    nb_drones: int = Field(gt=0)
+@dataclass
+class NbDronesConfig:
+    nb_drones: int
 
 
 class NbDronesParser(BaseParser):
 
     def parse(self, line: str) -> NbDronesConfig:
-        line = self._split_line(line)
-        self._parse_key(line[0])
-        nb_drones_value = self._parse_value(line[1])
-        try:
-            return NbDronesConfig(nb_drones=nb_drones_value)
-        except ValidationError:
+        tokens = self._split_line(line)
+        self._parse_key(tokens[0])
+        nb_drones_value = self._parse_value(tokens[1])
+        if nb_drones_value <= 0:
             raise NbDronesError("nb_drones must be greater than 0!")
+        return NbDronesConfig(nb_drones=nb_drones_value)
 
-    def _split_line(self, line: str) -> List[str]:
-        return line.split(":")
+    def _split_line(self, line: str) -> list[str]:
+        return line.split(":", 1)
 
-    
     def _parse_key(self, key: str) -> None:
         if key.strip().lower() != "nb_drones":
-            raise NbDronesError("Invalid nb_drones Key !")
+            raise NbDronesError("Invalid nb_drones key !")
         
     def _parse_value(self, value: str) -> int:
         try:
