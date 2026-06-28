@@ -22,3 +22,7 @@ class HubColor(Enum):
     MAROON = "maroon"
     SILVER = "silver"
     GOLD = "gold"
+    DARKRED = "darkred"
+    VIOLET = "violet"
+    CRIMSON = "crimson"
+    RAINBOW = "rainbow"

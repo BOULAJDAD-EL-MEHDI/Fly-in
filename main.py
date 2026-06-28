@@ -1,12 +1,11 @@
 from parser_engine import ParserEngine
 
 
-def main(config_path: str = "config.txt") -> int:
-    engine = ParserEngine(config_path)
-    for item in engine.config:
+def main() -> None:
+    config_path = "config.txt"
+    for item in ParserEngine(config_path).config:
         print(item)
-    return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

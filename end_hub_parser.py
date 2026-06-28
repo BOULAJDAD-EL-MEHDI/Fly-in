@@ -1,4 +1,3 @@
-import re
 from dataclasses import dataclass
 from typing import Tuple
 from base_parser import BaseParser
@@ -20,12 +19,17 @@ class EndHubParser(BaseParser):
         self._key_validation(tokens[0])
         coordinates = self._coordinates_validation(tokens)
         attributes = self._parse_attributes(line)
+        self._validate_attributes(attributes)
         color = self._color_validation(attributes)
         max_drones = self._max_drones_validation(attributes)
         return EndHubConfig(end_hub=coordinates, color=color, max_drones=max_drones)
 
     def _split_line(self, line: str) -> list[str]:
-        line = re.sub(r"\s*\[[^\]]+\]\s*$", "", line).strip()
+        line = line.strip()
+        if line.endswith("]"):
+            pos = line.rfind("[")
+            if pos != -1:
+                line = line[:pos].rstrip()
         return line.split()
 
     def _key_validation(self, key: str) -> None:
@@ -34,8 +38,11 @@ class EndHubParser(BaseParser):
             raise EndHubError("Invalid end_hub key !")
         
     def _coordinates_validation(self, tokens: list[str]) -> Tuple[int, int]:
-        if len(tokens) < 4 or tokens[1].lower().strip() != "goal":
-            raise EndHubError("The goal name of coordinates does not exist !")
+        if len(tokens) < 4:
+            raise EndHubError("Invalid end_hub format !")
+        name = tokens[1]
+        if any(char in name for char in "- []="):
+            raise EndHubError("Invalid zone name !")
         try:
             x = int(tokens[2])
             y = int(tokens[3])
@@ -43,10 +50,16 @@ class EndHubParser(BaseParser):
         except ValueError:
             raise EndHubError("Invalid coordinates type !")
     
+    def _validate_attributes(self, attributes: dict) -> None:
+        allowed_keys = {"color", "max_drones"}
+        for key in attributes:
+            if key not in allowed_keys:
+                raise EndHubError("Unknown metadata key !")
+
     def _color_validation(self, attributes: dict) -> HubColor:
         color_value = attributes.get("color")
         if not color_value:
-            raise EndHubError("Missing color value !")
+            return None
         try:
             return HubColor(color_value)
         except ValueError:
