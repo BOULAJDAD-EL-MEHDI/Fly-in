@@ -3,9 +3,8 @@ from parser_engine import ParserEngine
 
 def main() -> None:
     config_path = "config.txt"
-    for item in ParserEngine(config_path).config:
-        print(item)
-    
+    config = ParserEngine(config_path).config
+    print(type(config))    
 
 
 if __name__ == "__main__":
