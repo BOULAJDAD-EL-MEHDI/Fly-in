@@ -19,7 +19,7 @@ class GraphBuilder:
     def add_node(self, node: str):
         if node[1] not in self.graph:
             self.graph[node[1]] = {
-                "data": node[1:]
+                "data": node[1:],
                 "neighbors": []
             }
 
