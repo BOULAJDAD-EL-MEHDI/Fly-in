@@ -1,31 +1,52 @@
-
-
-
 class GraphBuilder:
-    def __init__(self, config: list):
-        self.config = config
+
+    def __init__(self, configs: list):
+        self.configs = configs
         self.graph = {}
 
-    def build_graph(self, config: list):
-        for line in config:
-            if line[0].startswith("hub"):
-                self.add_node()
+    def build_graph(self):
+        """Build the graph from the parsed configurations."""
 
-        for line in config:
-            if line[0].startswith("connection"):
-                self.add_connection()
-            
+        self._create_nodes()
+        self._create_connections()
 
-    def add_node(self, node: str):
-        if node[1] not in self.graph:
-            self.graph[node[1]] = {
-                "data": node[1:],
-                "neighbors": []
-            }
+        return self.graph
 
-    def add_connection():
-        pass
+    def _create_nodes(self):
+        """Create every hub in the graph."""
 
-    def get_graph():
-        pass
+        for config in self.configs:
+            if config[0].startswith("hub"):
+                self.add_node(config)
 
+    def _create_connections(self):
+        """Connect the hubs together."""
+
+        for config in self.configs:
+            if config[0].startswith("connection"):
+                self.add_connection(config)
+
+    def add_node(self, config):
+        """Add a node to the graph."""
+
+        position = config[1]
+
+        if position in self.graph:
+            return
+
+        self.graph[position] = {
+            "config": config,
+            "neighbors": []
+        }
+
+    def add_connection(self, config):
+        """Create a connection between two nodes."""
+
+        start = config[1]
+        end = config[2]
+
+        self.graph[start]["neighbors"].append(end)
+        self.graph[end]["neighbors"].append(start)
+
+    def get_graph(self):
+        return self.graph
