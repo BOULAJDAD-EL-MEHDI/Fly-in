@@ -7,8 +7,10 @@ from parser_errors import EndHubError
 
 @dataclass
 class EndHubConfig:
+    name: str
     end_hub: Tuple[int, int]
     color: HubColor
+    zone: str | None = None
     max_drones: int = 1
 
 
@@ -22,7 +24,7 @@ class EndHubParser(BaseParser):
         self._validate_attributes(attributes)
         color = self._color_validation(attributes)
         max_drones = self._max_drones_validation(attributes)
-        return EndHubConfig(end_hub=coordinates, color=color, max_drones=max_drones)
+        return EndHubConfig(name=tokens[1], end_hub=coordinates, color=color, max_drones=max_drones)
 
     def _split_line(self, line: str) -> list[str]:
         line = line.strip()

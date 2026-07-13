@@ -7,8 +7,10 @@ from parser_errors import HubError
 
 @dataclass
 class HubConfig:
+    name: str
     loop: Tuple[int, int]
     color: HubColor
+    zone: str | None = None
     max_drones: int = 1
 
 
@@ -23,7 +25,8 @@ class HubParser(BaseParser):
         self._zone_validation(attributes)
         color = self._color_validation(attributes)
         max_drones = self._max_drones_validation(attributes)
-        return HubConfig(loop=coordinates, color=color, max_drones=max_drones)
+        zone = self._zone_validation(attributes)
+        return HubConfig(name=tokens[1], loop=coordinates, color=color, zone=zone, max_drones=max_drones)
 
     def _split_line(self, line: str) -> list[str]:
         line = line.strip()

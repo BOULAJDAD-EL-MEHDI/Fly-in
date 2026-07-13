@@ -6,25 +6,19 @@ import sys
 
 
 def main(config_file: str) -> None:
-    # Parse the configuration file
     configs = ParserEngine(config_file).config
 
-    # Build the graph
     builder = GraphBuilder(configs)
-    graph = builder.build_graph()
+    graph, start_node, end_node = builder.build_graph()
 
-    # Create the solver
     solver = GraphSolver(graph)
+    result = solver.shortest_path(start_node, end_node)
 
-    # Example: find the shortest path
-    result = solver.shortest_path((0, 0), (5, 3))
-
-    # Display the result
     if result["path"]:
         print(f"Distance : {result['distance']}")
-        print(f"Path     : {result['path']}")
+        print(f"Path     : {' -> '.join(result['path'])}")
     else:
-        print("No path found.")
+        raise RuntimeError("No path found.")
 
 
 if __name__ == "__main__":
