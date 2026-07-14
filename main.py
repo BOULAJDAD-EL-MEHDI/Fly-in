@@ -31,8 +31,10 @@ def main():
     )
 
 
-    total_turns = len(simulation.simulate())
-    print(f"Total turns: {total_turns}")
+    # total_turns = len(simulation.simulate())
+    # print(f"Total turns: {total_turns}")
+
+    
     
     for line in simulation.simulate():
         print(line)

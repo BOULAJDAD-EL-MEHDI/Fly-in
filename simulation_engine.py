@@ -1,3 +1,6 @@
+from colors import color_text
+
+
 class SimulationEngine:
     def __init__(self, graph, nb_drones, start, end, paths):
         self.graph = graph
@@ -60,7 +63,8 @@ class SimulationEngine:
         if nxt == self.end:
             drone["finished"] = True
 
-        return f"D{drone['id']}-{nxt}"
+        config = self.graph[nxt]["config"]
+        return f"D{drone['id']}-{color_text(nxt, config.color)}"
 
     def simulate(self):
         output = []
