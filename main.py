@@ -17,7 +17,8 @@ def main():
 
     solver = GraphSolver(graph)
     path = solver.shortest_path(start, end)
-
+    if not path:
+        raise ValueError("Error: no path founded")
     nb_drones = next(c.nb_drones for c in configs if hasattr(c, "nb_drones"))
 
     paths = [path for _ in range(nb_drones)]
@@ -31,14 +32,16 @@ def main():
     )
 
 
-    # total_turns = len(simulation.simulate())
-    # print(f"Total turns: {total_turns}")
 
-    
-    
+    turn = 0    
     for line in simulation.simulate():
         print(line)
+        turn += 1
+    print(turn)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(e)
