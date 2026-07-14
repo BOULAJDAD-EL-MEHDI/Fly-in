@@ -1,33 +1,42 @@
+import sys
+
 from parser_engine import ParserEngine
 from graph_builder import GraphBuilder
 from graph_solver import GraphSolver
+from simulation_engine import SimulationEngine
 
-import sys
 
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python3 main.py <config_file>")
+        return
 
-def main(config_file: str) -> None:
-    configs = ParserEngine(config_file).config
+    configs = ParserEngine(sys.argv[1]).config
 
-    builder = GraphBuilder(configs)
-    graph, start_node, end_node = builder.build_graph()
+    graph, start, end = GraphBuilder(configs).build_graph()
 
     solver = GraphSolver(graph)
-    result = solver.shortest_path(start_node, end_node)
+    path = solver.shortest_path(start, end)
 
-    if result["path"]:
-        print(f"Distance : {result['distance']}")
-        print(f"Path     : {' -> '.join(result['path'])}")
-    else:
-        raise RuntimeError("No path found.")
+    nb_drones = next(c.nb_drones for c in configs if hasattr(c, "nb_drones"))
+
+    paths = [path for _ in range(nb_drones)]
+
+    simulation = SimulationEngine(
+        graph,
+        nb_drones,
+        start,
+        end,
+        paths,
+    )
+
+
+    total_turns = len(simulation.simulate())
+    print(f"Total turns: {total_turns}")
+    
+    for line in simulation.simulate():
+        print(line)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print(f"Usage: python3 {sys.argv[0]} <config_file>")
-        sys.exit(1)
-
-    try:
-        main(sys.argv[1])
-    except Exception as error:
-        print(f"Error: {error}")
-        sys.exit(1)
+    main()

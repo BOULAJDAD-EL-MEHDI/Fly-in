@@ -1,37 +1,61 @@
-from collections import deque
-
-
 class GraphSolver:
-
     def __init__(self, graph):
         self.graph = graph
 
     def shortest_path(self, start, end):
-        if start not in self.graph or end not in self.graph:
-            return {"path": [], "distance": None}
+        distances = {}
+        previous = {}
+        visited = set()
 
-        queue = deque([start])
-        previous = {start: None}
+        for node in self.graph:
+            distances[node] = float("inf")
 
-        while queue:
-            current = queue.popleft()
+        distances[start] = 0
+
+        while True:
+            current = None
+
+            for node in self.graph:
+                if node in visited:
+                    continue
+
+                if current is None or distances[node] < distances[current]:
+                    current = node
+
+            if current is None or distances[current] == float("inf"):
+                break
+
             if current == end:
                 break
 
-            for neighbor in self.graph[current]["neighbors"]:
-                if neighbor in previous:
-                    continue
-                previous[neighbor] = current
-                queue.append(neighbor)
+            visited.add(current)
 
-        path = []
-        current = end
-        while current is not None:
-            path.append(current)
-            current = previous.get(current)
+            for neighbor in self.graph[current]["neighbors"]:
+                config = self.graph[neighbor]["config"]
+
+                if config.zone == "blocked":
+                    continue
+
+                cost = 1
+
+                if config.zone == "restricted":
+                    cost = 2
+                elif config.zone == "priority":
+                    cost = 0.9
+
+                new_distance = distances[current] + cost
+
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    previous[neighbor] = current
+
+        if end not in previous and start != end:
+            return []
+
+        path = [end]
+
+        while path[-1] != start:
+            path.append(previous[path[-1]])
 
         path.reverse()
-        if path and path[0] == start:
-            return {"path": path, "distance": len(path) - 1}
-
-        return {"path": [], "distance": None}
+        return path
