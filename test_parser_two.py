@@ -1056,7 +1056,7 @@ print(f"\n{'=' * 62}")
 total = results["passed"] + results["failed"]
 print(f"Results: {results['passed']}/{total} passed", end="  ")
 if results["failed"] == 0:
-    print("\033[92mPERFECT PARSER\033[0m 🎯")
+    print("\033[92mPERFECT PARSER\033[0m")
 else:
     print(f"\033[91m{results['failed']} failures to fix\033[0m")
 print("=" * 62)

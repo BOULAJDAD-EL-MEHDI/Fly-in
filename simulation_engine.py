@@ -37,15 +37,15 @@ class SimulationEngine:
         if config.zone == "blocked":
             return None
 
-        # Restricted zone -> wait one turn
-        if config.zone == "restricted" and not drone["wait"]:
-            drone["wait"] = True
-            return None
-
-        drone["wait"] = False
+        # Restricted zone -> wait one turn before attempting entry.
+        if config.zone == "restricted":
+            if not drone["wait"]:
+                drone["wait"] = True
+                return None
+            # already waited; attempt entry without resetting wait until movement succeeds
 
         # Zone capacity
-        if zone_count.get(nxt, 0) >= config.max_drones:
+        if nxt != self.end and zone_count.get(nxt, 0) >= config.max_drones:
             return None
 
         edge = tuple(sorted((current, nxt)))
@@ -83,6 +83,10 @@ class SimulationEngine:
 
             if moves:
                 output.append(" ".join(moves))
+            elif not all(drone["finished"] for drone in self.drones):
+                if any(drone["wait"] for drone in self.drones):
+                    continue
+                raise RuntimeError("Simulation deadlock: no drone can move")
 
             if all(drone["finished"] for drone in self.drones):
                 break
