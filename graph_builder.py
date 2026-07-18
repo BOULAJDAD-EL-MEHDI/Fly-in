@@ -7,7 +7,7 @@ from start_hub_parser import StartHubConfig
 class GraphBuilder:
     def __init__(self, configs: list):
         self.configs = configs
-        self.graph = {}
+        self.graph : dict = {}
         self.start = None
         self.end = None
 

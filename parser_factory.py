@@ -9,7 +9,7 @@ from base_parser import BaseParser
 
 class ParserFactory:
 
-    _parsers = {
+    _parsers : dict[str, type[BaseParser]] = {
         "nb_drones": NbDronesParser,
         "start_hub": StartHubParser,
         "end_hub": EndHubParser,
@@ -20,6 +20,8 @@ class ParserFactory:
     @classmethod
     def create(cls, key: str) -> BaseParser:
         try:
-            return cls._parsers[key]()
+            parser_class = cls._parsers[key]
         except KeyError:
             raise ParsingKeyError(f"Invalid key: {key}")
+
+        return parser_class()

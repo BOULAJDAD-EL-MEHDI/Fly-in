@@ -3,13 +3,14 @@ from typing import Tuple
 from base_parser import BaseParser
 from colors import HubColor
 from parser_errors import HubError
+from typing import Optional
 
 
 @dataclass
 class HubConfig:
     name: str
     loop: Tuple[int, int]
-    color: HubColor
+    color: HubColor | None
     zone: str | None = None
     max_drones: int = 1
 
@@ -71,7 +72,7 @@ class HubParser(BaseParser):
             raise HubError("Invalid zone type !")
         return zone_value
 
-    def _color_validation(self, attributes: dict) -> HubColor:
+    def _color_validation(self, attributes: dict) -> Optional[HubColor]:
         color_value = attributes.get("color")
         if not color_value:
             return None

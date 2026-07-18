@@ -3,13 +3,14 @@ from typing import Tuple
 from base_parser import BaseParser
 from colors import HubColor
 from parser_errors import EndHubError
+from typing import Optional
 
 
 @dataclass
 class EndHubConfig:
     name: str
     end_hub: Tuple[int, int]
-    color: HubColor
+    color: HubColor | None
     zone: str | None = None
     max_drones: int = 1
 
@@ -58,7 +59,7 @@ class EndHubParser(BaseParser):
             if key not in allowed_keys:
                 raise EndHubError("Unknown metadata key !")
 
-    def _color_validation(self, attributes: dict) -> HubColor:
+    def _color_validation(self, attributes: dict) -> Optional[HubColor]:
         color_value = attributes.get("color")
         if not color_value:
             return None

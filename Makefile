@@ -28,7 +28,3 @@ lint:
 		--ignore-missing-imports \
 		--disallow-untyped-defs \
 		--check-untyped-defs
-
-lint-strict:
-	flake8 .
-	mypy . --strict

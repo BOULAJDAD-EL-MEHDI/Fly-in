@@ -20,7 +20,7 @@ class Simulation:
         self.connections = self._build_connections()
         self.number_of_drones = self._get_number_of_drones()
         self.drones = self._create_drones()
-        self.reserved_connections = {}
+        self.reserved_connections : dict = {}
         self.turn_number = 0
 
     def run(self) -> None:

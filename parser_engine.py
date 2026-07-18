@@ -1,5 +1,6 @@
 from parser_factory import ParserFactory
 from parser_errors import ParsingKeyError
+from typing import Any
 
 
 class ParserEngine:
@@ -7,7 +8,7 @@ class ParserEngine:
     def __init__(self, config_path: str) -> None:
         self.config = self.parse_file(config_path)
 
-    def parse_file(self, file_path: str) -> list:
+    def parse_file(self, file_path: str) -> list[Any]:
         config = []
         defined_zones: set[str] = set()
         connections: set[tuple[str, str]] = set()
@@ -81,7 +82,7 @@ class ParserEngine:
                     continue
 
                 if key == "connection":
-                    first_zone, second_zone = obj.connection
+                    first_zone, second_zone = obj.connection # type: ignore[attr-defined]
                     if first_zone not in defined_zones:
                         raise ParsingKeyError("Connection from unknown zone !")
                     if second_zone not in defined_zones:
