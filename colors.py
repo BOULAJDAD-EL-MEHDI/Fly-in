@@ -25,7 +25,6 @@ class HubColor(Enum):
     DARKRED = "darkred"
     VIOLET = "violet"
     CRIMSON = "crimson"
-    RAINBOW = "rainbow"
 
 ANSI_COLORS = {
     "red": "\033[91m",
@@ -57,16 +56,5 @@ ANSI_COLORS = {
 
 def color_text(text, color):
     color = color.value if hasattr(color, "value") else color
-
-    if color == "rainbow":
-        colors = [
-            "\033[91m",
-            "\033[93m",
-            "\033[92m",
-            "\033[96m",
-            "\033[94m",
-            "\033[95m",
-        ]
-        return "".join(colors[i % 6] + c for i, c in enumerate(text)) + ANSI_COLORS["reset"]
 
     return f"{ANSI_COLORS.get(color, '')}{text}{ANSI_COLORS['reset']}"

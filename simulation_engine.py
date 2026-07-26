@@ -33,24 +33,21 @@ class SimulationEngine:
 
         config = self.graph[nxt]["config"]
 
-        # Blocked zone
+
         if config.zone == "blocked":
             return None
 
-        # Restricted zone -> wait one turn before attempting entry.
+
         if config.zone == "restricted":
             if not drone["wait"]:
                 drone["wait"] = True
                 return None
-            # already waited; attempt entry without resetting wait until movement succeeds
 
-        # Zone capacity
         if nxt != self.end and zone_count.get(nxt, 0) >= config.max_drones:
             return None
 
         edge = tuple(sorted((current, nxt)))
 
-        # Connection capacity
         if connection_count.get(edge, 0) >= 1:
             return None
 

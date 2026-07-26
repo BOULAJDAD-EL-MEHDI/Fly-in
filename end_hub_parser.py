@@ -25,7 +25,8 @@ class EndHubParser(BaseParser):
         self._validate_attributes(attributes)
         color = self._color_validation(attributes)
         max_drones = self._max_drones_validation(attributes)
-        return EndHubConfig(name=tokens[1], end_hub=coordinates, color=color, max_drones=max_drones)
+        zone = self._zone_validation(attributes)
+        return EndHubConfig(name=tokens[1], end_hub=coordinates, color=color,zone=zone, max_drones=max_drones)
 
     def _split_line(self, line: str) -> list[str]:
         line = line.strip()
@@ -54,7 +55,7 @@ class EndHubParser(BaseParser):
             raise EndHubError("Invalid coordinates type !")
     
     def _validate_attributes(self, attributes: dict) -> None:
-        allowed_keys = {"color", "max_drones"}
+        allowed_keys = {"color", "max_drones", "zone"}
         for key in attributes:
             if key not in allowed_keys:
                 raise EndHubError("Unknown metadata key !")
@@ -77,3 +78,14 @@ class EndHubParser(BaseParser):
         if max_drones <= 0:
             raise EndHubError("max_drones must be greater than 0 !")
         return max_drones
+    
+    def _zone_validation(self, attributes: dict) -> str | None:
+        zone_value = attributes.get("zone")
+        if zone_value is None:
+            return None
+        if not zone_value:
+            raise EndHubError("Zone type is empty !")
+        valid_zones = {"normal", "restricted", "priority", "blocked"}
+        if zone_value not in valid_zones:
+            raise EndHubError("Invalid zone type !")
+        return zone_value
