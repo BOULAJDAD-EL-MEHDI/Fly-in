@@ -4,11 +4,28 @@ from typing import Any
 
 
 class ParserEngine:
+    """Parse and validate configuration files into a list of config objects."""
 
     def __init__(self, config_path: str) -> None:
+        """Initialize the parser engine from a configuration file.
+
+        Args:
+            config_path: Path to the configuration file to parse.
+        """
         self.config = self.parse_file(config_path)
 
     def parse_file(self, file_path: str) -> list[Any]:
+        """Parse a configuration file and return validated config objects.
+
+        Args:
+            file_path: Path to the configuration file.
+
+        Returns:
+            A list of parsed configuration objects.
+
+        Raises:
+            ParsingKeyError: If the file contains invalid or inconsistent entries.
+        """
         config = []
         defined_zones: set[str] = set()
         connections: set[tuple[str, str]] = set()

@@ -7,6 +7,11 @@ from simulation_engine import SimulationEngine
 
 
 def main():
+    """Run the parser, graph building, path solving, and simulation pipeline.
+
+    Returns:
+        None.
+    """
     if len(sys.argv) != 2:
         print("Usage: python3 main.py <config_file>")
         return

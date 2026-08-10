@@ -1,8 +1,24 @@
 class GraphSolver:
+    """Solve shortest-path problems on the built graph."""
+
     def __init__(self, graph):
+        """Initialize the solver with a graph.
+
+        Args:
+            graph: Graph representation to solve on.
+        """
         self.graph = graph
 
     def shortest_path(self, start, end):
+        """Find a lowest-cost path from start to end.
+
+        Args:
+            start: Name of the starting node.
+            end: Name of the destination node.
+
+        Returns:
+            A list of node names representing the path, or an empty list if no path exists.
+        """
         distances = {}
         previous = {}
         visited = set()

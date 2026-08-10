@@ -1,23 +1,23 @@
 class NbDronesError(Exception):
-    """"raising nb_drones errors """
+    """Raised when a nb_drones entry is invalid."""
     pass
 
 class HubError(Exception):
-    """raising hub errors """
+    """Raised when a hub entry is invalid."""
     pass
 
 class StartHubError(Exception):
-    """raising starting hub errors """
+    """Raised when a start_hub entry is invalid."""
     pass
 
 class EndHubError(Exception):
-    """raising end hub errors """
+    """Raised when an end_hub entry is invalid."""
     pass
 
 class ConnectionsError(Exception):
-    """raising connection errors """
+    """Raised when a connection entry is invalid."""
     pass
 
 class ParsingKeyError(Exception):
-    """raisign any key Error !"""
+    """Raised when a configuration file contains an invalid key or structure."""
     pass

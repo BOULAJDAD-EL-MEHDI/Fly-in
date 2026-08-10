@@ -5,13 +5,25 @@ from start_hub_parser import StartHubConfig
 
 
 class GraphBuilder:
+    """Build an adjacency graph from parsed configuration objects."""
+
     def __init__(self, configs: list):
+        """Initialize the builder with parsed configuration entries.
+
+        Args:
+            configs: Parsed configuration objects to convert into a graph.
+        """
         self.configs = configs
         self.graph : dict = {}
         self.start = None
         self.end = None
 
     def build_graph(self):
+        """Create the graph representation from all configuration objects.
+
+        Returns:
+            A tuple containing the graph, the start node, and the end node.
+        """
         for config in self.configs:
             if isinstance(config, StartHubConfig):
                 self.start = config.name
@@ -30,6 +42,12 @@ class GraphBuilder:
         return self.graph, self.start, self.end
 
     def add_node(self, name, config=None):
+        """Add a node to the graph if it does not already exist.
+
+        Args:
+            name: Name of the hub to add.
+            config: Optional configuration object associated with the node.
+        """
         if name not in self.graph:
             self.graph[name] = {
                 "config": config,
@@ -37,6 +55,11 @@ class GraphBuilder:
             }
 
     def add_connection(self, config):
+        """Connect two nodes in the graph using a connection configuration.
+
+        Args:
+            config: Connection configuration describing the link between two nodes.
+        """
         node1, node2 = config.connection
 
         self.add_node(node1)

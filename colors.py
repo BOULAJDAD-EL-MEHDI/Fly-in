@@ -2,6 +2,8 @@ from enum import Enum
 
 
 class HubColor(Enum):
+    """Supported display colors for hubs in the simulation output."""
+
     RED = "red"
     GREEN = "green"
     BLUE = "blue"
@@ -55,6 +57,15 @@ ANSI_COLORS = {
 
 
 def color_text(text, color):
+    """Apply ANSI color formatting to text.
+
+    Args:
+        text: Text to display.
+        color: Color name or HubColor enum value to apply.
+
+    Returns:
+        The formatted text with ANSI color codes.
+    """
     color = color.value if hasattr(color, "value") else color
 
     return f"{ANSI_COLORS.get(color, '')}{text}{ANSI_COLORS['reset']}"

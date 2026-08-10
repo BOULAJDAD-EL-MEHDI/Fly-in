@@ -2,13 +2,32 @@ from abc import ABC, abstractmethod
 
 
 class BaseParser(ABC):
+    """Abstract base class for parsing configuration lines."""
 
     @abstractmethod
     def parse(self, line: str) -> object:
-        """Parse a config line and return a config object."""
+        """Parse a configuration line into a config object.
+
+        Args:
+            line: Raw configuration line to parse.
+
+        Returns:
+            A parsed configuration object.
+        """
         pass
 
     def _parse_attributes(self, line: str) -> dict:
+        """Extract metadata attributes enclosed in square brackets.
+
+        Args:
+            line: Raw configuration line that may contain metadata.
+
+        Returns:
+            A dictionary of parsed attribute names and values.
+
+        Raises:
+            ValueError: If the metadata block is malformed.
+        """
         stripped_line = line.strip()
         open_count = stripped_line.count("[")
         close_count = stripped_line.count("]")

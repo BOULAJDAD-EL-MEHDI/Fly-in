@@ -2,7 +2,18 @@ from colors import color_text
 
 
 class SimulationEngine:
+    """Simulate drone movement across the graph according to hub rules."""
+
     def __init__(self, graph, nb_drones, start, end, paths):
+        """Initialize the simulation with the graph and drone routes.
+
+        Args:
+            graph: Graph containing hub configuration and neighbors.
+            nb_drones: Number of drones to simulate.
+            start: Starting hub name.
+            end: Destination hub name.
+            paths: Planned paths for each drone.
+        """
         self.graph = graph
         self.nb_drones = nb_drones
         self.start = start
@@ -19,6 +30,16 @@ class SimulationEngine:
             })
 
     def move_drone(self, drone, zone_count, connection_count):
+        """Attempt to move a single drone to its next zone.
+
+        Args:
+            drone: Dictionary describing the drone state.
+            zone_count: Count of drones currently occupying each zone.
+            connection_count: Count of drones already using each connection.
+
+        Returns:
+            A formatted move string if the drone advances, otherwise None.
+        """
         if drone["finished"]:
             return None
 
@@ -64,6 +85,11 @@ class SimulationEngine:
         return f"D{drone['id']}-{color_text(nxt, config.color)}"
 
     def simulate(self):
+        """Run the full drone simulation until all drones have finished.
+
+        Returns:
+            A list of turn-by-turn move strings.
+        """
         output = []
 
         zone_count = {self.start: self.nb_drones}
