@@ -69,7 +69,8 @@ class SimulationEngine:
 
         edge = tuple(sorted((current, nxt)))
 
-        if connection_count.get(edge, 0) >= 1:
+        if (connection_count.get(edge, 0)
+                >= self.graph[current]["link_capacity"][nxt]):
             return None
 
         zone_count[current] -= 1
@@ -77,6 +78,7 @@ class SimulationEngine:
         connection_count[edge] = connection_count.get(edge, 0) + 1
 
         drone["index"] += 1
+        drone["wait"] = False
 
         if nxt == self.end:
             drone["finished"] = True
@@ -97,9 +99,13 @@ class SimulationEngine:
         while True:
             moves = []
             connection_count = {}
+            waiting = False
 
             for drone in self.drones:
+                was_waiting = drone["wait"]
                 move = self.move_drone(drone, zone_count, connection_count)
+                if not was_waiting and drone["wait"]:
+                    waiting = True
 
                 if move:
                     moves.append(move)
@@ -107,7 +113,8 @@ class SimulationEngine:
             if moves:
                 output.append(" ".join(moves))
             elif not all(drone["finished"] for drone in self.drones):
-                if any(drone["wait"] for drone in self.drones):
+                if waiting:
+                    output.append("")
                     continue
                 raise RuntimeError("Simulation deadlock: no drone can move")
 

@@ -1,193 +1,330 @@
- *This project has been created as part of the 42 curriculum by  eboulajd.*
+*This project has been created as part of the 42 curriculum by eboulajd.*
 
- ---
- # Description
- ### General idea bout the Fly-in project
- Fly-in is project that contain allot of consepts, the main goal of this project is to make engin to manipulate the trafc of multiple dornes, input comme from config.txt.
- ### Config file
-  config gile contain three parts first one is `nb_drones` parameter that should be at the begining of the file, if not the program should be stop and raise costom Error message.
- ```
- nb_drones: n => n is positive integer && it should be at the first line 
- ```
-the second part is the parameters that contain three types: 
- ```
- coordinates/
- ├── start_hub:   start    (coordinates)  [Metadata]
- ├── hub:         name_1   (coordinates)  [Metadata]
- ├── hub:         name_2   (coordinates)  [Metadata]
- ├── ...          ...       ...           [Metadata]
- ├── hub:         name_n   (coordinates)  [Metadata]
- ├── end_hub:     goal     (coordinates)  [Metadata]
- ```
- so the type one is `start_hub` that contain the name of hub and the coordinates and also some Metadata, and it should be just one parameter named `start_hub` and if not the program must stop and raise costom message Error, the second type of parameters is `hub` so this is like a place that have name and coordinates and some metadata, this one is the zones that the drones may or may not pass throuit, the last type is like the first one, `end_hub` is parameter that contain also a name and coordinates and metadata and this one is the goal of all drones, so after starting from `start_hub`and pasing by all or some of `hub` zones the last station or the goal is `end_hub` zone.
+# Fly-in
 
- the last part is connection part:
- ```
- connection: start-hub_1    [metadata]
- connection: hub_1-hub_2    [metadata]
- connection: hub_1-hub_3    [metadata]
- connection: hub_3-goal     [metadata]
- ```
- and any line start with `#` is comment and should be skiped !
- ```
- #comment line that should be skiped !
- ```
+**A Python command-line simulator for routing multiple drones through a graph with zone and connection constraints.**
 
- ### parsing part
- thsi part is wher we read form the config file line by line and if ther is any problem we raise Costom Error message that expalin the error and the line wher it's hapend.
- so at the parsing part i use Creational designe pattern espesialy `Factory Method` to create an object to work with it in the rest of the code.
- the class `FactoryEngin` takes the name of cofig file as argv parameter, the main method in this class is the `parse_file` method that take config file as parameter and return list,
- let's divin to this function deeply !
- firs thing is declare some parameters and flags that we will work with, 
- after opening the confing file i loop throuit, so at this pat i handel the comments first, than it normal conig lines, by cheking the key is valide for any if conndition in the for loop if ther is match and ther is not general problem in the config line it pass the line in to `create` method that in `ParserFactory`, so after puting the data in to parser variable we pass it as aparameter in to parse abstract method, the `ParserFactory` class use `create` class method that parse using a key, which each one is have a sepesial class and that's why we use the  `_parsers` dict to make it automated and avoid using if conditions, each class of those use simple algorithme so parse the line of code with simple algo so it returns a clean and well parsed config line, and also for parsing we make `BaseParser` that enhirit from `ABC` class, also i use `HubColor` class that enhirit from Enum, 
- combining all of this consepts and codes abd base on **Factory Method** i make this well structerd parsing.
+Fly-in reads a text map, validates its hubs and connections, finds a lowest-cost route from the start to the destination, and simulates the drones moving along that route. Its terminal output shows each successful movement and the total number of turns.
 
- ### Graph building 
- At the part of graph builder the code is simple and clean, so we have one calss that do all the work, the class of `GraphBuilder` contain four simple methodes:
- 
- `__init__`: that take the config as parameter, initialise the graph with empty dictionary, initialise start and end flags with None value.
+The project brings together structured parsing, object-oriented design, graph representation, weighted shortest paths, and scheduling under capacity constraints. The implementation uses one route for every drone; it does not distribute traffic across alternative routes or guarantee the fewest turns for the entire fleet.
 
-`add_node`: that simply check if the hub name parameter if ther is not in the graph than it's add it as key and add two values config = None, also neghbhors empty list that will be fille with other hubs name later
-
-`add_connection`: this function just add a connection between two nodes
-
-`build_graph`: this is the main functin in the graph builder calss, it loops over every parsed object, and make the connetcions and hubs.
-
-### Algorithm explanation
-The graph is traversed using Dijkstra's shortest path algorithm, which computes the minimum-cost path from the start hub to the destination hub. Every hub is initially assigned an infinite distance, except the start hub, which begins with a distance of 0. At each iteration, the algorithm selects the unvisited hub with the smallest known distance and updates the distances of its neighboring hubs if a shorter path is found. The movement cost depends on the destination hub's zone type: normal hubs have a cost of 1, restricted hubs have a higher cost of 2, priority hubs have a lower cost of 0.9, and blocked hubs are ignored entirely since they cannot be traversed. Once the destination is reached (or no reachable hubs remain), the algorithm reconstructs the optimal path by following the recorded predecessors from the destination back to the start, producing the final shortest route.
-
-### Simulation
-The simulation executes the movement of all drones turn by turn, ensuring that every drone moves simultaneously while respecting the constraints of the environment. During each turn, the simulator attempts to advance every drone to the next hub on its precomputed shortest path. Before a movement is allowed, it verifies several conditions: the destination hub must not be blocked, drones entering a restricted hub must wait one turn before moving, the destination hub must not exceed its maximum drone capacity, and only one drone may use the same connection during a single turn. If all conditions are satisfied, the drone advances to the next hub, the occupancy of both hubs and the connection usage are updated, and the movement is recorded. This process repeats until every drone reaches the destination hub, producing a step-by-step simulation of all drone movements while enforcing zone and connection constraints.
-
-# Example
-
-### Example Input (`config.txt`)
-
-```txt
-# Easy Level 3: Basic capacity management
-nb_drones: 4
-
-start_hub: start 0 0 [color=green max_drones=4]
-hub: bottleneck 1 0 [color=orange max_drones=2]
-hub: wide_area 2 0 [color=blue max_drones=3]
-end_hub: goal 3 0 [color=red max_drones=4]
-
-connection: start-bottleneck [max_link_capacity=4]
-connection: bottleneck-wide_area [max_link_capacity=4]
-connection: wide_area-goal [max_link_capacity=4]
-```
-
-### Execution
-
-```bash
-make run
-```
-
-or
-
-```bash
-python3 main.py config.txt
-```
-
-### Expected Output
-
-```txt
-D1-bottleneck
-D1-wide_area D2-bottleneck
-D1-goal D2-wide_area D3-bottleneck
-D2-goal D3-wide_area D4-bottleneck
-D3-goal D4-wide_area
-D4-goal
-```
-
-In the output, each line represents one simulation turn. Every entry has the format:
-
-```text
-D<drone_id>-<hub_name>
-```
-
-where `drone_id` identifies the drone and `hub_name` is the hub it occupies after moving during that turn. Multiple entries on the same line indicate drones moving simultaneously while respecting hub capacities and connection constraints.
-
-## Visual Representation
-
-The simulation uses colored terminal output to make the movement of drones easier to follow.
-
-- 🟢 **Green**: Start hub
-- 🔴 **Red**: End hub
-- 🔵 **Blue**: Normal hub
-- 🟠 **Orange**: Restricted hub
-- 🟡 **Yellow**: Priority hub
-- 🟣 **Purple**: Danger hub
-- ⚫ **Black**: Blocked hub
-
-Using different colors allows users to quickly identify hub types and better understand the simulation as drones move through the network.
-
-# Instructions
-
+## Installation and usage
 
 ### Requirements
 
-- Python 3.10 or later
-- `pip`
-- `make`
+- **Python 3.10 or later**, for the type annotation syntax used in the source.
+- **Make**, for the convenience commands below.
+- **pip**, to install the packages listed in `requirements.txt`.
 
-### Installation
+There is no compilation step. The simulator itself imports only the Python standard library and can run directly:
 
-Install the project dependencies:
+```sh
+python3 main.py config.txt
+python3 main.py maps/easy/01_linear_path.txt
+```
 
-```bash
+To install the declared dependencies in an isolated environment:
+
+```sh
+python3 -m venv .venv
+. .venv/bin/activate
 make install
 ```
 
-### Execution
+`requirements.txt` lists `pydantic`, `flake8`, and `mypy`. Flake8 and mypy support development checks; Pydantic is currently not used by the code. Parsed records use standard-library dataclasses and explicit validation.
 
-Run the simulation using the default configuration file (`config.txt`):
+| Command | Purpose |
+| --- | --- |
+| `make run` | Run `main.py` with `config.txt`. |
+| `make run CONFIG=maps/medium/03_priority_puzzle.txt` | Run another map. |
+| `make debug CONFIG=config.txt` | Open the program and selected map in Python's `pdb` debugger. |
+| `make lint` | Run Flake8, then mypy if Flake8 succeeds. |
+| `make clean` | Remove Python bytecode and mypy/pytest cache directories beneath the project. |
 
-```bash
-make run
+The CLI requires exactly one map filename. Errors encountered while parsing, opening the file, finding a route, or simulating are printed, and the process exits with status `1`. Calling the program with the wrong number of arguments prints its usage message.
+
+### Example output
+
+For the supplied `maps/easy/01_linear_path.txt`:
+
+```sh
+python3 main.py maps/easy/01_linear_path.txt
 ```
 
-### Debugging
-
-Run the project with the Python debugger:
-
-```bash
-make debug
+```text
+D1-waypoint1
+D1-waypoint2 D2-waypoint1
+D1-goal D2-waypoint2
+D2-goal
+4
 ```
 
-### Static Analysis
+Each entry is `D<drone_id>-<destination_hub>`. Entries on the same line belong to the same simulation turn. Drones that stay in place have no entry. A turn spent entirely waiting is represented by a blank line, and the final integer includes those turns. The example omits ANSI escape sequences used to color hub names.
 
-Run the required linting and type checking:
+## Map format
 
-```bash
+```text
+# Comments and blank lines are ignored.
+nb_drones: 3
+
+start_hub: start 0 0 [color=green]
+hub: corridor 1 0 [zone=restricted color=orange max_drones=2]
+end_hub: goal 2 0 [color=red]
+
+connection: start-corridor [max_link_capacity=2]
+connection: corridor-goal
+```
+
+### Records and ordering
+
+| Record | Syntax | Meaning |
+| --- | --- | --- |
+| Drone count | `nb_drones: N` | Positive integer; must be the first meaningful line. |
+| Start | `start_hub: NAME X Y [metadata]` | Exactly one departure hub. |
+| Intermediate hub | `hub: NAME X Y [metadata]` | A possible waypoint. |
+| Destination | `end_hub: NAME X Y [metadata]` | Exactly one arrival hub, distinct from the start. |
+| Connection | `connection: NAME1-NAME2 [metadata]` | An undirected link between two already declared hubs. |
+
+Use a space after the colon in hub and connection records. Hub names are unique and case-sensitive. They cannot contain whitespace or `-`, `[`, `]`, or `=`. Coordinates are integer pairs; negative values are accepted. Coordinates are stored as map metadata and do not determine connectivity, distance, or travel time.
+
+`#` starts a comment, including after a record. Metadata is optional and occupies a single trailing bracket block. Inside it, use whitespace-separated `key=value` pairs without spaces around `=`. An empty block, duplicate keys, unknown attributes, or malformed brackets are rejected.
+
+### Hub metadata
+
+| Attribute | Default | Behavior |
+| --- | --- | --- |
+| `zone` | Unspecified, treated as `normal` | Controls route cost and restricted/blocked movement rules. |
+| `max_drones` | `1` | Positive occupancy limit for intermediate hubs. |
+| `color` | No foreground color | Controls terminal display only. |
+
+All drones initially occupy the start, regardless of its `max_drones` value. The destination accepts all arriving drones, regardless of its capacity. These endpoint exceptions allow the fleet to depart and finish even when endpoint metadata uses the default capacity.
+
+Supported zones:
+
+| Zone | Cost of entering it during pathfinding | Simulation behavior |
+| --- | --- | --- |
+| `normal` | `1` | Move in one turn when capacity allows. |
+| `priority` | `0.9` | Move in one turn; the lower cost favors this zone during route selection. |
+| `restricted` | `2` | Wait one turn before entering; capacity contention may add further delay. |
+| `blocked` | Not traversable | Excluded from routes; a blocked start has no valid route. |
+
+Color and zone are independent: `color=orange` alone does not make a hub restricted, and `color=black` alone does not block it. The supported lowercase colors are:
+
+```text
+red green blue yellow orange purple pink black white gray brown
+cyan magenta lime navy teal olive maroon silver gold darkred
+violet crimson
+```
+
+### Connection metadata
+
+`max_link_capacity` is a positive integer, defaulting to `1`. It limits the number of drones using that connection in one turn. The same link is identified in both directions, so its capacity is shared.
+
+Self-loops, references to undeclared hubs, and duplicate connections—including reversed duplicates—are rejected. A syntactically valid map can still have no traversable route; pathfinding detects that separately.
+
+## How the project works
+
+```text
+Map file
+   |
+   v
+ParserEngine -> ParserFactory -> specialized BaseParser implementations
+   |                            (validated dataclass records)
+   v
+GraphBuilder -> undirected adjacency graph with hub and link metadata
+   |
+   v
+GraphSolver -> one weighted shortest path
+   |
+   v
+SimulationEngine -> drone states, occupancy, per-turn link usage
+   |
+   v
+main.py -> colored movement lines and total turns
+```
+
+### 1. Parsing, validation, and OOP
+
+`ParserEngine` reads the file with a `with open(...)` context manager, strips comments, and dispatches each meaningful record. It also checks rules spanning multiple lines: required entries, unique hub names, known connection endpoints, and duplicate links. Sets provide membership checks for declared hubs and connections.
+
+`ParserFactory` holds a dictionary mapping record keys to parser classes. Its class method constructs the corresponding parser. Each parser implements the abstract `BaseParser.parse()` interface and returns its own dataclass, such as `HubConfig` or `ConnectionConfig`. This separates parser selection from each record's parsing rules.
+
+`BaseParser._parse_attributes()` handles the shared bracket and key/value syntax. Specialized parsers validate integer coordinates, positive capacities, permitted zone values, and colors. `HubColor`, an enum, restricts color values to the supported set. Type annotations describe record fields and parser interfaces; runtime correctness comes from these explicit checks, since dataclasses do not enforce field types themselves.
+
+Custom exceptions distinguish record-specific errors from file-level inconsistencies. The CLI catches exceptions at its entry point. Error messages describe the problem but currently do not include line numbers.
+
+### 2. Graph representation and data structures
+
+`GraphBuilder` constructs a dictionary keyed by hub name. Each node holds:
+
+- `config`: the hub's parsed dataclass, including its zone, coordinates, color, and capacity.
+- `neighbors`: a list of connected hub names.
+- `link_capacity`: a dictionary mapping each neighbor to the connection's capacity.
+
+Each connection adds adjacency and capacity information at both endpoints. This represents an undirected graph, including branches, cycles, and dead ends. The graph occupies **O(V + E)** space, where `V` is the number of hubs and `E` is the number of connections.
+
+The parser requires both endpoints before a connection can be built. That validation ensures the graph builder receives links to known hubs.
+
+### 3. Weighted pathfinding with Dijkstra's algorithm
+
+`GraphSolver.shortest_path()` maintains three structures:
+
+- `distances`: the best known cost to each hub, initially infinity except for the start at zero.
+- `previous`: the predecessor used to reach each hub at its best known cost.
+- `visited`: the hubs whose minimum distance has been settled.
+
+At each iteration, it scans the graph to select the unvisited hub with the smallest distance. For each accessible neighbor, it adds the cost of entering that neighbor. If the candidate cost is lower, it updates both the distance and predecessor. This update is called **edge relaxation**.
+
+All traversable costs are positive, allowing Dijkstra's greedy selection to settle minimum distances. The search stops when it reaches the destination or no reachable unvisited hub remains. It reconstructs the route by following predecessors backward from the destination, then reversing that list. It returns an empty list when no route exists.
+
+This implementation uses a linear scan to select the next hub, giving **O(V² + E)** time and **O(V)** auxiliary space. Equal-cost alternatives retain the first predecessor discovered, with traversal order following graph insertion order.
+
+The route cost is based on zone types. Hub and connection capacities affect the later simulation, not path selection. Consequently, the cheapest route for one drone may not provide the fastest completion time for many drones.
+
+### 4. Turn-based scheduling and state management
+
+`main.py` assigns the same computed path to every drone. Each drone has a dictionary containing its ID, path reference, current path index, restricted-zone wait flag, and completion flag. The path is shared without modification; each drone advances its own index.
+
+During each turn, the simulator visits drones in ascending ID order and attempts at most one move per drone:
+
+1. Skip finished drones.
+2. Read the next hub and reject a blocked destination.
+3. For a restricted hub, record the first waiting turn before attempting entry on a later turn.
+4. Check the next hub's occupancy, except at the final destination.
+5. Check the connection's remaining capacity for this turn.
+6. On success, update occupancy and link usage, advance the index, clear the wait flag, and mark arrivals as finished.
+
+`zone_count` persists across turns. `connection_count` resets each turn and uses a sorted endpoint tuple as its key, so `A-B` and `B-A` consume the same resource. Occupancy changes immediately after each successful move: a hub vacated by an earlier drone can accept a later drone in that turn.
+
+This is a **single-threaded, deterministic simulation**. The output groups movements into logical turns, while the implementation resolves them sequentially. It uses no threads, mutexes, or condition variables.
+
+A turn without movement is allowed when a drone has just begun its required wait. Otherwise, unfinished drones with no progress cause a simulation deadlock error. Tracking a newly started wait prevents an old wait flag from keeping a stalled simulation alive indefinitely.
+
+The loop performs one pass over the drones per turn: **O(T × D)** simulation work for `T` turns and `D` drones, excluding output formatting. It accumulates the complete output list before printing. Python manages object memory; file handles are closed by the context manager, including on parsing errors.
+
+## Technical challenges and learning outcomes
+
+The central engineering challenge is keeping input validity, route choice, and movement feasibility consistent across the pipeline:
+
+- **Validation across records:** a valid-looking connection is only usable if both endpoints exist, and duplicate names would otherwise merge distinct hub definitions in the graph.
+- **Traversal through cycles and branches:** distance relaxation, a visited set, and predecessor reconstruction find a route without getting trapped in graph loops or dead ends.
+- **Two kinds of capacity:** hub occupancy lasts across turns, while link usage is a resource budget renewed every turn.
+- **Restricted-zone state:** the wait flag belongs to the next move and must reset after that move, so every restricted hub imposes its own delay.
+- **Progress versus deadlock:** an intentional waiting turn must count toward elapsed time without being mistaken for a permanent stall.
+
+These problems develop practical skills in decomposing a program into cooperating classes, designing structured records, validating untrusted text input, implementing weighted graph search, and reasoning about state transitions and resource constraints. They also illustrate the distinction between finding a shortest route and optimizing a complete fleet schedule.
+
+## Project structure
+
+```text
+Fly-in/
+├── main.py                  # CLI and pipeline orchestration
+├── base_parser.py           # Abstract interface and metadata parsing
+├── parser_factory.py        # Record key -> parser class registry
+├── parser_engine.py         # File parsing and cross-record validation
+├── parser_errors.py         # Custom exception classes
+├── nb_drones_parser.py      # Drone count parser and dataclass
+├── start_hub_parser.py      # Start hub parser and dataclass
+├── hub_parser.py            # Intermediate hub parser and dataclass
+├── end_hub_parser.py        # Destination parser and dataclass
+├── connection_parser.py     # Connection parser and dataclass
+├── graph_builder.py         # Adjacency graph construction
+├── graph_solver.py          # Weighted Dijkstra search
+├── simulation_engine.py     # Drone movement and turn accounting
+├── colors.py                # Color enum and ANSI formatting
+├── config.txt               # Default map
+├── maps/
+│   ├── easy/                # 3 maps: linear path, fork, capacity
+│   ├── medium/              # 3 maps: dead ends, cycle, priorities
+│   ├── hard/                # 3 maps: maze, capacity, combined challenges
+│   ├── challenger/          # 1 larger stress map
+│   └── README.md            # Map descriptions and challenge targets
+├── requirements.txt
+├── Makefile
+└── README.md
+```
+
+## Testing
+
+The repository provides map fixtures and static-analysis commands; it does not contain a committed automated test suite.
+
+### Run the supplied maps
+
+```sh
+python3 -B main.py config.txt
+for map in maps/easy/*.txt maps/medium/*.txt maps/hard/*.txt maps/challenger/*.txt; do
+    echo "$map"
+    python3 -B main.py "$map" || break
+done
+```
+
+`-B` avoids generating bytecode. During this review, the default configuration and all ten supplied maps completed on Python 3.13.15. The linear example takes **4 turns**, the basic-capacity map takes **4 turns**, and the challenger map takes **67 turns**. The targets in `maps/README.md` are challenge goals, not guarantees of this implementation.
+
+Focused temporary regression checks cover link capacities, hub occupancy, repeated restricted-zone waits, idle-turn accounting, duplicate hub names, malformed records, and path selection around priority and blocked zones. These checks were run during the review and are not included as a repository test command.
+
+### Static analysis
+
+```sh
 make lint
 ```
 
-Run strict type checking:
+The existing source has style and typing diagnostics, so this command is not currently a passing check. Flake8 failures stop the Make recipe before mypy runs. To run the configured type check independently:
 
-```bash
-make lint-strict
+```sh
+mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports \
+    --disallow-untyped-defs --check-untyped-defs
 ```
 
-### Cleanup
+`lint-strict` is listed in `.PHONY` but has no recipe; it performs no checks.
 
-Remove Python cache files and temporary directories:
+## Resources
 
-```bash
-make clean
-```
+Useful links to learn the concepts used in Fly-in.
 
- 
+### Python and object-oriented programming
 
+- [Classes and objects](https://docs.python.org/3/tutorial/classes.html) — the basics of OOP in Python.
+- [Inheritance](https://docs.python.org/3/tutorial/classes.html#inheritance) — sharing behavior between parser classes.
+- [Abstract classes](https://docs.python.org/3/library/abc.html) — defining the common `BaseParser` interface.
+- [Class methods](https://docs.python.org/3/library/functions.html#classmethod) — how `ParserFactory.create()` works.
+- [Dataclasses](https://docs.python.org/3/library/dataclasses.html) — storing parsed configuration records.
+- [Enums](https://docs.python.org/3/library/enum.html) — representing the supported hub colors.
+- [Type hints](https://docs.python.org/3/library/typing.html) — describing expected types in the code.
+- [Modules and imports](https://docs.python.org/3/tutorial/modules.html) — connecting the project's Python files.
 
+### Data structures and memory
 
+- [Lists](https://docs.python.org/3/tutorial/datastructures.html#more-on-lists) — storing neighbors, paths, and drones.
+- [Dictionaries](https://docs.python.org/3/tutorial/datastructures.html#dictionaries) — storing the graph, distances, and drone states.
+- [Sets](https://docs.python.org/3/tutorial/datastructures.html#sets) — tracking visited hubs and detecting duplicates.
+- [Tuples](https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences) — storing coordinates and connection endpoints.
+- [Objects, references, and memory](https://docs.python.org/3/reference/datamodel.html#objects-values-and-types) — understanding shared objects and automatic memory management.
 
----
-# Resources
+### Parsing and error handling
 
-### documentations
-[File handling](https://www.w3schools.com/python/python_file_handling.asp)\
-[Python abc Module](https://www.w3schools.com/Python/ref_module_abc.asp)\
-[Enum in python](https://www.geeksforgeeks.org/python/enum-in-python/)\
-[Creational Design Patterns](https://refactoring.guru/design-patterns/creational-patterns)\
-[Dijkstra algorithme](https://www.geeksforgeeks.org/dsa/dijkstras-shortest-path-algorithm-greedy-algo-7/)
+- [Reading files and using `with`](https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files) — reading a map and closing the file safely.
+- [String methods](https://docs.python.org/3/library/stdtypes.html#string-methods) — splitting records and removing comments and whitespace.
+- [Exceptions](https://docs.python.org/3/tutorial/errors.html) — reporting invalid input and handling failures.
+- [Custom exceptions](https://docs.python.org/3/tutorial/errors.html#user-defined-exceptions) — creating project-specific parsing errors.
+- [Command-line arguments](https://docs.python.org/3/library/sys.html#sys.argv) — getting the map filename from the command line.
+
+### Graphs and algorithms
+
+- [Undirected graphs and adjacency lists](https://algs4.cs.princeton.edu/41graph/) — representing hubs and their connections.
+- [Dijkstra's algorithm and shortest paths](https://algs4.cs.princeton.edu/44sp/) — weighted routes, edge relaxation, and path reconstruction.
+- [Algorithm complexity](https://algs4.cs.princeton.edu/14analysis/) — understanding running time and memory costs.
+
+### Development tools and terminal output
+
+- [Python debugger (`pdb`)](https://docs.python.org/3/library/pdb.html) — stepping through the program.
+- [Flake8](https://flake8.pycqa.org/en/latest/) — checking Python style and common mistakes.
+- [Mypy](https://mypy.readthedocs.io/en/stable/getting_started.html) — checking type annotations.
+- [Virtual environments and pip](https://docs.python.org/3/tutorial/venv.html) — installing dependencies in an isolated environment.
+- [ANSI terminal colors](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html) — the escape sequences used to color hub names.
+
+### Examples in this project
+
+- [Parser factory](parser_factory.py) — choosing a parser using a class registry.
+- [Input validation](parser_engine.py) — checking names, required records, and connections.
+- [Turn-based scheduling](simulation_engine.py) — tracking movement, waiting, capacities, and deadlocks.
+- [Challenge maps](maps/README.md) — examples of the graph problems the simulator handles.

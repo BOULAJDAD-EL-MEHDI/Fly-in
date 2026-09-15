@@ -43,7 +43,7 @@ class HubParser(BaseParser):
             raise HubError("Invalid hub key !")
         
     def _coordinates_validation(self, tokens: list[str]) -> Tuple[int, int]:
-        if len(tokens) < 4:
+        if len(tokens) != 4:
             raise HubError("Invalid hub format !")
         name = tokens[1]
         if any(char in name for char in "- []="):

@@ -68,6 +68,8 @@ class ParserEngine:
                     start_name = parts[1].strip()
                     if not start_name:
                         raise ParsingKeyError("Invalid start_hub name !")
+                    if start_name in defined_zones:
+                        raise ParsingKeyError("Duplicate zone name !")
                     defined_zones.add(start_name)
                     config.append(obj)
                     continue
@@ -84,6 +86,8 @@ class ParserEngine:
                         raise ParsingKeyError("Invalid end_hub name !")
                     if start_name is not None and start_name == end_name:
                         raise ParsingKeyError("start_hub and end_hub are the same zone !")
+                    if end_name in defined_zones:
+                        raise ParsingKeyError("Duplicate zone name !")
                     defined_zones.add(end_name)
                     config.append(obj)
                     continue

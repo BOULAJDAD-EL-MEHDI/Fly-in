@@ -16,6 +16,8 @@ class ConnectionParser(BaseParser):
         fields = self._split_line(line)
         if len(fields) < 2:
             raise ConnectionsError("Connection line is empty !")
+        if len(fields) != 2:
+            raise ConnectionsError("Invalid connection format !")
         self._key_validation(fields[0])
         connection = self._connections_validation(fields[1])
         attributes = self._parse_attributes(line)

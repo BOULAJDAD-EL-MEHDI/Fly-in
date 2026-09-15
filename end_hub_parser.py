@@ -42,7 +42,7 @@ class EndHubParser(BaseParser):
             raise EndHubError("Invalid end_hub key !")
         
     def _coordinates_validation(self, tokens: list[str]) -> Tuple[int, int]:
-        if len(tokens) < 4:
+        if len(tokens) != 4:
             raise EndHubError("Invalid end_hub format !")
         name = tokens[1]
         if any(char in name for char in "- []="):

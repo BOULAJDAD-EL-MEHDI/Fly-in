@@ -12,6 +12,8 @@ class NbDronesParser(BaseParser):
 
     def parse(self, line: str) -> NbDronesConfig:
         tokens = self._split_line(line)
+        if len(tokens) != 2:
+            raise NbDronesError("Invalid nb_drones format !")
         self._parse_key(tokens[0])
         nb_drones_value = self._parse_value(tokens[1])
         if nb_drones_value <= 0:

@@ -19,6 +19,9 @@ class GraphSolver:
         Returns:
             A list of node names representing the path, or an empty list if no path exists.
         """
+        if self.graph[start]["config"].zone == "blocked":
+            return []
+
         distances = {}
         previous = {}
         visited = set()

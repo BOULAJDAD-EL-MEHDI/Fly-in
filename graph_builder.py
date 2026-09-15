@@ -51,7 +51,8 @@ class GraphBuilder:
         if name not in self.graph:
             self.graph[name] = {
                 "config": config,
-                "neighbors": []
+                "neighbors": [],
+                "link_capacity": {}
             }
 
     def add_connection(self, config):
@@ -67,3 +68,5 @@ class GraphBuilder:
 
         self.graph[node1]["neighbors"].append(node2)
         self.graph[node2]["neighbors"].append(node1)
+        self.graph[node1]["link_capacity"][node2] = config.link_capacity
+        self.graph[node2]["link_capacity"][node1] = config.link_capacity
